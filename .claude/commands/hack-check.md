@@ -39,10 +39,17 @@ Spusť `gh --version`.
 účastník nechce/nemůže instalovat, workshop půjde dokončit, ale s manuálními kroky
 na webu.
 
-### 5. GitHub přihlášení
+### 5. GitHub přihlášení + oprávnění
 Pokud `gh` existuje, spusť `gh auth status`.
-- ✓ pokud přihlášen
-- ✗ pokud ne. Řekni: "Přihlas se přes: `gh auth login`"
+- ✓ pokud přihlášen a výstup obsahuje `repo` scope (nebo `read:org` — znamená
+  to, že token má dostatečná oprávnění)
+- ✗ pokud nepřihlášen. Řekni: "Přihlas se přes: `gh auth login`"
+- ⚠ pokud přihlášen, ale chybí `repo` scope. Řekni: "Nemáš oprávnění pro
+  vytváření repozitářů. Spusť: `gh auth refresh -s repo`"
+
+Dále ověř, že `gh` umí pushovat — spusť `ssh -T git@github.com 2>&1` (nebo
+`gh auth setup-git` pro HTTPS). Pokud SSH selže a HTTPS taky, zaznamenej si
+to pro krok 10 (push nebude fungovat).
 
 ### 6. Supabase přístup
 Zeptej se uživatele: "Přihlásíš se na https://supabase.com/dashboard — vidíš svůj dashboard?"
@@ -95,11 +102,31 @@ echo -n "medior" > .participant-level   # nebo junior / senior
 Tohle je klíčový krok — účastník přestává pracovat nad workshopovým kitem
 a začíná pracovat nad vlastním repem.
 
+**Nejdřív vysvětli, co se bude dít** (zvlášť důležité pro juniory):
+"Tenhle kit jsem ti připravil já — jsou v něm agenti, kteří tě budou provázet.
+Teď tě odpojím od mojí kopie a založím ti vlastní repo na GitHubu.
+Od teď je to tvůj kód, můžeš v něm dělat cokoliv."
+
 **Zeptej se na název projektu:**
 "Jak chceš pojmenovat svůj projekt? Jedno slovo, bez diakritiky, lowercase.
 Příklady: moje-todos, habit-tracker, rezervace."
 
 Potom:
+
+**Pre-flight (před smazáním originu!):**
+
+```bash
+# 1. Ověř, že gh umí pushovat — vytvoř testovací repo a hned smaž
+gh api user -q .login
+```
+
+Pokud `gh api user` selže, push nebude fungovat → přeskoč na fallback níže.
+
+Pokud `gh` funguje, zkontroluj git protocol. Spusť `gh auth setup-git` — to
+nastaví HTTPS credential helper, což obchází případné problémy s SSH klíči.
+Tohle je nejspolehlivější cesta pro workshop (účastníci nemusí řešit SSH).
+
+**Teprve po úspěšném pre-flightu pokračuj:**
 
 ```bash
 # Odpoj workshop-kit remote
@@ -109,13 +136,18 @@ git remote remove origin 2>/dev/null
 git add -A
 git commit -m "chore: workshop kit setup"
 
-# Vytvoř účastníkovo vlastní repo
+# Vytvoř účastníkovo vlastní repo (HTTPS push přes gh credential helper)
 gh repo create <nazev> --public --source=. --push
 ```
 
-- ✓ pokud `gh repo create` uspělo. Řekni: "Repo je na GitHubu: https://github.com/<user>/<nazev>"
-- ✗ pokud selhalo (auth, síť...). Řekni: "GitHub repo se nepodařilo vytvořit.
-  Nevadí — pokračuj s /hack-prd, repo nastavíme později přes /hack-deploy."
+**Ověř, že push prošel** — po `gh repo create` spusť `git log --oneline -1 origin/main`
+a ověř, že remote ukazuje na stejný commit. Pokud ano:
+- ✓ Řekni: "Repo je na GitHubu: https://github.com/<user>/<nazev>"
+
+Pokud pre-flight nebo push selže:
+- ✗ **Nesmaž origin pokud ještě nebyl smazaný.** Řekni: "GitHub repo se
+  nepodařilo vytvořit. Nevadí — pokračuj s /hack-prd, repo nastavíme později
+  přes /hack-deploy."
   Nastav flag — vytvoř soubor `.github-pending` aby hack-deploy věděl, že repo
   ještě neexistuje.
 

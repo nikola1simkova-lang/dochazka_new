@@ -10,12 +10,11 @@ Přečti `.participant-level` (default `medior`). Matice v CLAUDE.md.
 
 **Agent-specific dopady:**
 
-- **junior:** Doporučuj **Možnost A (Vercel web)** — je vizuální a méně děsivá.
-  Aktivně kontroluj po každém kroku, že se mu to povedlo ("už vidíš svou URL
-  v dashboardu?").
-- **medior:** Projdi standardně, nech rozhodnout A/B.
-- **senior:** Nabídni rovnou **Možnost B (CLI)** jako rychlejší. Přeskoč basic
-  vysvětlení.
+- **junior:** Možnost A (Vercel web) — je vizuální a méně děsivá. Aktivně
+  kontroluj po každém kroku ("už vidíš svou URL v dashboardu?").
+- **medior:** Možnost A jako default, zmíň B jako alternativu.
+- **senior:** Zmíň obě, ale upozorni na browser-auth limit CLI varianty.
+  Pokud ví co dělá a chce CLI, nech ho.
 
 Pro všechny: bezpečnostní checky (`.env.local` v `.gitignore`) dělej vždy —
 nejde o úroveň, jde o riziko leaku.
@@ -59,9 +58,12 @@ git push -u origin main
 ```
 
 ### 3. Vercel deploy
-Nabídni dvě možnosti:
 
-**Možnost A — přes Vercel web (jednodušší):**
+**Doporuč Možnost A** (web) jako default — je spolehlivější, nevyžaduje browser
+auth z terminálu (CLI varianta otevírá prohlížeč, což nefunguje ve VM nebo
+remote desktopu).
+
+**Možnost A — přes Vercel web (doporučená):**
 1. Jdi na vercel.com → New Project → Import z GitHubu
 2. Vyber repo
 3. V "Environment Variables" přidej:
@@ -69,7 +71,12 @@ Nabídni dvě možnosti:
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 4. Klikni Deploy
 
-**Možnost B — přes CLI:**
+**Možnost B — přes CLI** (jen pokud účastník výslovně chce):
+
+⚠ Pozor: `npx vercel` otevírá prohlížeč pro přihlášení. Pokud browser
+nefunguje (VM, remote desktop, WSL), tato varianta selže. V tom případě
+použij Možnost A.
+
 ```bash
 npx vercel --yes
 npx vercel env add NEXT_PUBLIC_SUPABASE_URL
