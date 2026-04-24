@@ -28,18 +28,24 @@ Pochop, co appka dělá a jaký je její aktuální stav.
 
 ### 2. Zjisti, co uživatel chce
 
-Vstup může přijít ze dvou zdrojů — **zeptej se, nebo nabídni oba:**
+**Preferuj issue-driven development** — jeden issue = jeden branch = jeden PR.
+Tohle je návyk, co odlišuje "vibera" od vývojáře.
 
-**a) GitHub Issues (pokud repo je na GitHubu):**
+**a) GitHub Issues (preferovaný způsob):**
 Spusť `gh issue list --state open --limit 10 2>/dev/null`. Pokud jsou otevřené issues,
-ukaž je:
-"Máš otevřené issues:
+ukaž je jako první:
+"Máš otevřené issues — vyber si na čem chceš pracovat:
   #1 — Filtrování podle kategorie
   #2 — Přidat login
-Na kterém chceš pracovat? Nebo popiš něco jiného."
+Nebo popiš něco jiného (v tom případě ti vytvořím issue)."
 
 **b) Přímý popis:**
-"Co chceš přidat nebo vylepšit? Popiš mi to jednou dvěma větami."
+Pokud uživatel popíše feature přímo, vytvoř pro ni issue:
+```bash
+gh issue create --title "<název>" --body "<krátký popis>"
+```
+Řekni: "Vytvořil jsem issue #N — pracuju z něj. Tohle je dobrý návyk: každá
+feature má svůj issue, branch a PR. Víš přesně co kde je."
 
 Pokud uživatel neví a nemá issues, nabídni nápady na základě PRD:
 - Chybí ti nějaká user story z PRD, kterou ještě nemáš implementovanou?
@@ -92,10 +98,13 @@ Pokud ano:
 gh pr create --title "<popis>" --body "Closes #<číslo-issue-pokud-existuje>"
 ```
 
-Řekni: "PR je vytvořený! Vercel automaticky vytvoří preview deployment — za chvíli
-uvidíš odkaz přímo v PR na GitHubu. Tam si appku otestuješ ještě před mergem do main.
+Řekni: "PR je vytvořený! Vercel automaticky vytvoří **preview deployment** — za chvíli
+uvidíš odkaz přímo v PR na GitHubu. To je tvůj staging — otestuj appku tam, než
+ji pustíš do produkce. Tenhle návyk ti ušetří spoustu problémů: nikdy nemerguj
+bez toho, abys viděl výsledek na preview URL.
 
 Další kroky:
+- Otevři preview URL a proklikej svou feature
 - `/hack-review` — nech druhou AI projít tvoje změny na PR
 - Až jsi spokojený: `gh pr merge --squash` a Vercel deployuje do produkce."
 
@@ -164,6 +173,7 @@ Přizpůsob prompt podle účastníkovy appky:
 - `GROQ_API_KEY` nesmí být `NEXT_PUBLIC_` — volání LLM musí jít přes server
 - Groq free tier je štědrý, ale přidej loading state a error handling
 - Přidej `GROQ_API_KEY` i na Vercel (Environment Variables) pokud chceš deploy
+- Aktualizuj `.env.example` — přidej `GROQ_API_KEY=gsk_...your-key-here`
 
 ## Pravidla
 
@@ -175,6 +185,8 @@ Přizpůsob prompt podle účastníkovy appky:
   a řekni mu ať ho pustí v SQL Editoru. Na každou novou tabulku přidej RLS + policy:
   `ALTER TABLE <nazev> ENABLE ROW LEVEL SECURITY;`
   `CREATE POLICY "<nazev>_allow_all" ON <nazev> FOR ALL USING (true) WITH CHECK (true);`
+  SQL ulož do `migrations/<dalsi-cislo>_<nazev>.sql` a commitni — ať je každá
+  DB změna v gitu.
 - Nemaž existující funkčnost pokud tě o to uživatel explicitně nepožádá
 - Pokud appka po změně nefunguje, oprav to než půjdeš dál
 - Commit messages: conventional format (`feat:`, `fix:`, `refactor:`, `style:`)

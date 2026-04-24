@@ -191,6 +191,16 @@ Ulož PRD do souboru `PRD.md` v kořenu projektu (ostatní agenti ho čtou):
 -- Používej: id integer generated always as identity primary key
 ```
 
+**Ulož SQL i do souboru** — ať je historie změn v gitu:
+
+```bash
+mkdir -p migrations
+```
+
+Ulož SQL do `migrations/001_initial.sql`. Tohle je jednoduchá verze
+databázových migrací — každá změna databáze má svůj soubor s číslem,
+commitne se do gitu a víš přesně co se kdy změnilo.
+
 ---
 
 #### B) GitHub Issue s PRD
@@ -267,9 +277,9 @@ a já je tam vytvořím."
   Tato policy povolí vše (čtení i zápis) pro všechny — je to workshop MVP.
   Až účastník přidá auth, policy se zpřísní na `auth.uid() = user_id`.
 - PRD.md vždy ulož lokálně (agenti ho čtou). GitHub Issue je bonus pro uživatele.
-- Commitni PRD.md a pushni:
+- Commitni PRD.md a migrations a pushni:
   ```bash
-  git add PRD.md
+  git add PRD.md migrations/
   git commit -m "docs: PRD — [název aplikace]"
   git push
   ```

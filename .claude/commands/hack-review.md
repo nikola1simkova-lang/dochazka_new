@@ -38,6 +38,10 @@ Přečti:
   Pokud existuje otevřený PR (`gh pr view --json number`), zmíň jeho číslo v reportu.
 - Pokud git nemá historii, prostě projdi `src/` a koukni co je tam nové
 
+**Preview URL:** Pokud existuje PR s Vercel preview, připomeň: "Otevři si
+preview URL z PR a proklikej feature ručně — automatický review nenahradí
+lidský test na staging."
+
 ### 2. Kontroluj ve čtyřech kategoriích
 
 Pro každou změnu se ptej v tomto pořadí:

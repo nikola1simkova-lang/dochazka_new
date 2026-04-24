@@ -71,6 +71,15 @@ Na základě PRD:
 
 5. Vytvoř `.env.local` s hodnotami od uživatele.
 
+6. Vytvoř `.env.example` — šablonu bez skutečných hodnot, kterou commitneš do gitu:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=eyJ...your-key-here
+   ```
+   Tohle je důležitý návyk: `.env.local` je v `.gitignore` (tajné klíče),
+   ale `.env.example` ukazuje kolegovi (nebo tobě za měsíc) jaké proměnné
+   appka potřebuje.
+
 6. Vytvoř Supabase client utility (`src/lib/supabase.ts`):
    - Browser client pro klientské komponenty
    - Server client pro server komponenty
