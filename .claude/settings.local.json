@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(gh label *)",
+      "Bash(npx create-next-app@latest *)",
+      "Bash(shopt -s dotglob)",
+      "Bash(mv nextapp/* .)",
+      "Bash(shopt -u dotglob)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(git push *)"
     ]
   }
 }
