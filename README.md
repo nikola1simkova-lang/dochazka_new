@@ -1,8 +1,17 @@
-# PRD Vibe Kit
+# Docházkový systém ADH-PLOTY
 
-Předpřipravený kit s AI agenty pro **Product Vibe Coding** workshop.
+Webová aplikace pro evidenci docházky zaměstnanců firmy ADH-PLOTY. Zaměstnanci zapisují příchod, odchod a přestávku přes mobil, personalista sleduje docházku a stahuje ji do Excelu pro účetní.
 
-Žádný kód, žádná appka — jen agenti a pravidla. Všechno si vygeneruješ sám z vlastního PRD.
+## Stack
+Next.js + Supabase + Tailwind + Vercel
+
+## Lokální vývoj
+```bash
+npm install
+npm run dev
+```
+
+---
 
 ## Quick Start
 
