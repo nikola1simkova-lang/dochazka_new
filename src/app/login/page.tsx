@@ -19,8 +19,14 @@ export default function LoginPage() {
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (error || !data.user) {
-      setError('Nesprávný e-mail nebo heslo')
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+      return
+    }
+
+    if (!data.user) {
+      setError('Přihlášení selhalo')
       setLoading(false)
       return
     }
@@ -43,13 +49,14 @@ export default function LoginPage() {
           <p className="text-gray-500 text-sm mt-1">Docházkový systém</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-4" autoComplete="off">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoComplete="off"
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="vas@email.cz"
               required
@@ -61,12 +68,13 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <p className="text-red-500 text-sm bg-red-50 p-3 rounded-lg">{error}</p>}
 
           <button
             type="submit"

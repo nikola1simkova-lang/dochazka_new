@@ -48,7 +48,7 @@ export default function CreateEmployeeForm() {
         <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600 text-lg">✕</button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-3">
+      <form onSubmit={handleSubmit} className="space-y-3" autoComplete="off">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Celé jméno</label>
           <input
@@ -64,6 +64,7 @@ export default function CreateEmployeeForm() {
           <input
             name="email"
             type="email"
+            autoComplete="off"
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="jan.novak@email.cz"
             required
@@ -74,6 +75,7 @@ export default function CreateEmployeeForm() {
           <input
             name="password"
             type="password"
+            autoComplete="new-password"
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Minimálně 6 znaků"
             minLength={6}
