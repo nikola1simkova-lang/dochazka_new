@@ -10,21 +10,9 @@
 
 ## Nutné před testováním 🔴
 
-### 1. Opravit vytváření zaměstnanců
-Trigger byl smazán — server action `createEmployee` musí po vytvoření auth uživatele
-také vložit záznam do `profiles`. Aktuálně se profil nevytváří.
-
-**Soubor:** `src/app/admin/zamestnanci/actions.ts`
-**Co udělat:** Po `supabase.auth.admin.createUser()` přidat INSERT do profiles:
-```typescript
-const { data: newUser } = await supabase.auth.admin.createUser(...)
-await supabase.from('profiles').insert({
-  id: newUser.user.id,
-  name,
-  email,
-  role: 'employee'
-})
-```
+### 1. ~~Opravit vytváření zaměstnanců~~ ✅
+`createEmployee` nyní po `auth.admin.createUser()` vloží profil do tabulky `profiles`.
+Pokud INSERT selže, auth uživatel se automaticky smaže (rollback).
 
 ### 2. Otestovat přihlášení zaměstnance
 - Přidat testovacího zaměstnance přes admin panel

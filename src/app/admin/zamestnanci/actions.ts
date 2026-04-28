@@ -14,7 +14,7 @@ export async function createEmployee(formData: FormData) {
 
   const supabase = createAdminClient()
 
-  const { error } = await supabase.auth.admin.createUser({
+  const { data: newUser, error } = await supabase.auth.admin.createUser({
     email,
     password,
     user_metadata: { name, role: 'employee' },
@@ -26,6 +26,18 @@ export async function createEmployee(formData: FormData) {
       return { error: 'Tento e-mail je již registrován' }
     }
     return { error: 'Chyba při vytváření zaměstnance: ' + error.message }
+  }
+
+  const { error: profileError } = await supabase.from('profiles').insert({
+    id: newUser.user.id,
+    name,
+    email,
+    role: 'employee',
+  })
+
+  if (profileError) {
+    await supabase.auth.admin.deleteUser(newUser.user.id)
+    return { error: 'Chyba při vytváření profilu: ' + profileError.message }
   }
 
   revalidatePath('/admin/zamestnanci')
