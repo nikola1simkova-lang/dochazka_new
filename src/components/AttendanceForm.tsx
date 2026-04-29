@@ -57,7 +57,7 @@ export default function AttendanceForm({ employeeId }: Props) {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border p-4 sm:p-5">
+    <div className="bg-white rounded-xl shadow-sm border p-4 sm:p-5 overflow-hidden">
       <h2 className="text-lg font-semibold text-gray-900 mb-4">Zapsat docházku</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -67,7 +67,7 @@ export default function AttendanceForm({ employeeId }: Props) {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full max-w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
         </div>
@@ -79,7 +79,7 @@ export default function AttendanceForm({ employeeId }: Props) {
               type="time"
               value={timeFrom}
               onChange={(e) => setTimeFrom(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full max-w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
@@ -89,7 +89,7 @@ export default function AttendanceForm({ employeeId }: Props) {
               type="time"
               value={timeTo}
               onChange={(e) => setTimeTo(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full max-w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
@@ -121,7 +121,7 @@ export default function AttendanceForm({ employeeId }: Props) {
             type="text"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full max-w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="např. Praha, Brno, home office..."
           />
         </div>
