@@ -3,6 +3,7 @@ export type Profile = {
   name: string
   email?: string
   role: 'admin' | 'employee'
+  initial_password?: string
   created_at: string
 }
 

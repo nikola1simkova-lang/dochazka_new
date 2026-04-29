@@ -33,6 +33,7 @@ export async function createEmployee(formData: FormData) {
     name,
     email,
     role: 'employee',
+    initial_password: password,
   })
 
   if (profileError) {

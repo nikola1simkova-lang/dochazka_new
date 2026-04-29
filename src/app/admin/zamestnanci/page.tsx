@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import CreateEmployeeForm from '@/components/CreateEmployeeForm'
 import LogoutButton from '@/components/LogoutButton'
+import PasswordCell from '@/components/PasswordCell'
 import Link from 'next/link'
 import type { Profile } from '@/types'
 
@@ -44,6 +45,7 @@ export default async function ZamestnnaciPage() {
                   <div>
                     <p className="text-sm font-medium">{emp.name}</p>
                     {emp.email && <p className="text-xs text-gray-400">{emp.email}</p>}
+                    <PasswordCell password={emp.initial_password} />
                   </div>
                   <Link
                     href={`/admin/dochazka/${emp.id}`}
