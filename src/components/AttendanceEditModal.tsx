@@ -49,7 +49,7 @@ export default function AttendanceEditModal({ employeeId, date, dateLabel, recor
           <input type="hidden" name="employee_id" value={employeeId} />
           <input type="hidden" name="date" value={date} />
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3">
             <div>
               <label className="text-xs text-gray-500 block mb-1">Od</label>
               <input
@@ -57,7 +57,7 @@ export default function AttendanceEditModal({ employeeId, date, dateLabel, recor
                 name="time_from"
                 defaultValue={record?.time_from?.slice(0, 5) ?? '07:00'}
                 required
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full appearance-none border rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
@@ -67,7 +67,7 @@ export default function AttendanceEditModal({ employeeId, date, dateLabel, recor
                 name="time_to"
                 defaultValue={record?.time_to?.slice(0, 5) ?? '16:00'}
                 required
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full appearance-none border rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
