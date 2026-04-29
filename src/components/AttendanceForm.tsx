@@ -72,7 +72,7 @@ export default function AttendanceForm({ employeeId }: Props) {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="flex flex-col gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Od</label>
             <input
