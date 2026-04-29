@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Geist } from 'next/font/google'
 import './globals.css'
 
@@ -9,10 +9,16 @@ export const metadata: Metadata = {
   description: 'Docházkový systém ADH-PLOTY',
 }
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="cs">
-      <body className={`${geist.className} bg-gray-50`}>{children}</body>
+      <body className={`${geist.className} bg-gray-50 overflow-x-hidden`}>{children}</body>
     </html>
   )
 }

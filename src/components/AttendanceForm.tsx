@@ -57,7 +57,7 @@ export default function AttendanceForm({ employeeId }: Props) {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border p-5">
+    <div className="bg-white rounded-xl shadow-sm border p-4 sm:p-5">
       <h2 className="text-lg font-semibold text-gray-900 mb-4">Zapsat docházku</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
