@@ -8,6 +8,10 @@
 - Login funkční (admin: obchod@adh-ploty.cz)
 - Admin panel přístupný
 - `createEmployee` — po vytvoření auth uživatele se vloží profil do `profiles` (rollback při chybě)
+- Editace záznamu adminem ✅
+- GitHub přesunut pod firemní účet: github.com/plotyadh-code/dochazka_new ✅
+- Supabase přesunut pod firemní účet (projekt jxostbtyqvjgpjujkevy) ✅
+- Deploy na Vercel pod plotyadh-code's projects ✅
 
 ## Nutné před testováním 🔴
 
@@ -21,34 +25,28 @@
 - Ověřit výpočet hodin a přesčasů
 - Otestovat export do Excelu
 
+## Hotovo (nové) ✅
+- Převod přesčasových hodin do dalšího měsíce (per zaměstnanec per měsíc)
+- Přesčasy na víkendy a státní svátky = všechny hodiny jsou přesčas
+- Státní svátky ČR pro všechny roky vč. pohyblivých Velikonoc
+
 ## Další kroky 🟡
 
-### 3. Editace záznamu adminem
-- V měsíčním přehledu chybí tlačítko pro editaci záznamu
-- Admin by měl mít možnost opravit špatně zadanou docházku
-
-### 4. Archivace dokumentů (Excel)
+### 3. Archivace dokumentů (Excel)
 - Zachovat posledních 6 měsíců exportů na zaměstnance
 - Starší záznamy archivovat (nemazat z DB, jen označit)
 
-### 5. Svátky v měsíčním přehledu
+### 4. Svátky v měsíčním přehledu
 - Řádek svátku barevně odlišit (stejně jako víkend)
 - Hodiny počítat stejně jako pracovní den
 - Seznam státních svátků ČR natvrdo nebo konfigurovatelně
 
-### 6. Deploy na Vercel
-- Spustit `/hack-deploy`
-- Nastavit env proměnné na Vercel
-- Otestovat produkční verzi
-
-### 7. Supabase pro klienta
-- Až bude app otestovaná → přenést pod firemní účet ADH-PLOTY
-- Vytvořit nové Supabase projekty (dev + prod)
-- Spustit migrace v novém projektu
-
 ## Poznámky
 - Trigger `on_auth_user_created` byl smazán (způsoboval chyby) — profily vytváří app
 - Admin účet: obchod@adh-ploty.cz (heslo v Supabase Auth)
-- Projekt: github.com/nikola1simkova-lang/dochazka_new
+- GitHub: github.com/plotyadh-code/dochazka_new
+- Vercel: plotyadh-code's projects
+- Supabase: projekt jxostbtyqvjgpjujkevy (firemní účet)
+- Tabulka profiles má sloupce: id, name, role, email, initial_password, created_at
 - Víkendy a svátky: hodiny se počítají stejně, jen řádek má jinou barvu
 - Přesčasy: data připravuje appka, výpočet nuancí řeší účetní externě
