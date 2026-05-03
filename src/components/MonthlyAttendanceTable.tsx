@@ -240,42 +240,6 @@ export default function MonthlyAttendanceTable({ employee, records, year, month,
         </div>
       </div>
 
-      {/* Přesčasy — převod */}
-      <div className="bg-white rounded-xl border p-4 space-y-3">
-        {carriedIn !== 0 && (
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-500">Převedeno z {CZECH_MONTHS[prevMonth.month - 1]}</span>
-            <span className={`font-semibold px-2 py-0.5 rounded ${carriedIn >= 0 ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
-              {fmtOvertime(carriedIn)}h
-            </span>
-          </div>
-        )}
-        <div className="flex justify-between items-center text-sm">
-          <span className="text-gray-500">Zbývá na konci měsíce</span>
-          <span className={`font-semibold px-2 py-0.5 rounded ${totalBalance >= 0 ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
-            {fmtOvertime(totalBalance)}h
-          </span>
-        </div>
-        <div className="flex items-center gap-2 pt-1 border-t">
-          <span className="text-sm text-gray-500 mr-1">Přesčasy:</span>
-          <button
-            onClick={() => handleModeChange('pay')}
-            disabled={isPending}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${mode === 'pay' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-          >
-            Proplatit
-          </button>
-          <button
-            onClick={() => handleModeChange('carry')}
-            disabled={isPending}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${mode === 'carry' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-          >
-            Převést do {CZECH_MONTHS[nextMonth.month - 1]}
-          </button>
-          {isPending && <span className="text-xs text-gray-400">Ukládám...</span>}
-        </div>
-      </div>
-
       {/* Export */}
       <div className="flex justify-end">
         <button
@@ -422,6 +386,42 @@ export default function MonthlyAttendanceTable({ employee, records, year, month,
               {fmtOvertime(totalOvertime)}h
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Přesčasy — převod */}
+      <div className="bg-white rounded-xl border p-4 space-y-3">
+        {carriedIn !== 0 && (
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-gray-500">Převedeno z {CZECH_MONTHS[prevMonth.month - 1]}</span>
+            <span className={`font-semibold px-2 py-0.5 rounded ${carriedIn >= 0 ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
+              {fmtOvertime(carriedIn)}h
+            </span>
+          </div>
+        )}
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-gray-500">Zbývá na konci měsíce</span>
+          <span className={`font-semibold px-2 py-0.5 rounded ${totalBalance >= 0 ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
+            {fmtOvertime(totalBalance)}h
+          </span>
+        </div>
+        <div className="flex items-center gap-2 pt-1 border-t">
+          <span className="text-sm text-gray-500 mr-1">Přesčasy:</span>
+          <button
+            onClick={() => handleModeChange('pay')}
+            disabled={isPending}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${mode === 'pay' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          >
+            Proplatit
+          </button>
+          <button
+            onClick={() => handleModeChange('carry')}
+            disabled={isPending}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${mode === 'carry' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          >
+            Převést do {CZECH_MONTHS[nextMonth.month - 1]}
+          </button>
+          {isPending && <span className="text-xs text-gray-400">Ukládám...</span>}
         </div>
       </div>
     </div>
