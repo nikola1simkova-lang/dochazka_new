@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import type { Profile, AttendanceRecord } from '@/types'
 import AttendanceEditModal from './AttendanceEditModal'
 import { setOvertimeMode } from '@/app/admin/dochazka/actions'
+import { getCzechHolidays, isHoliday } from '@/lib/holidays'
 
 type Props = {
   employee: Profile
@@ -63,8 +64,20 @@ export default function MonthlyAttendanceTable({ employee, records, year, month,
   const prevMonth = month === 1 ? { year: year - 1, month: 12 } : { year, month: month - 1 }
   const nextMonth = month === 12 ? { year: year + 1, month: 1 } : { year, month: month + 1 }
 
+  const holidays = getCzechHolidays(year)
+
+  function effectiveOvertime(record: AttendanceRecord, dateStr: string, date: Date): number {
+    if (isWeekend(date) || isHoliday(dateStr, holidays)) {
+      return Number(record.hours_worked)
+    }
+    return Number(record.overtime)
+  }
+
   const totalHours = records.reduce((s, r) => s + Number(r.hours_worked || 0), 0)
-  const totalOvertime = records.reduce((s, r) => s + Number(r.overtime || 0), 0)
+  const totalOvertime = records.reduce((s, r) => {
+    const date = new Date(r.date + 'T00:00:00')
+    return s + effectiveOvertime(r, r.date, date)
+  }, 0)
   const totalBalance = Math.round((carriedIn + totalOvertime) * 100) / 100
 
   function handleModeChange(newMode: 'pay' | 'carry') {
@@ -295,19 +308,23 @@ export default function MonthlyAttendanceTable({ employee, records, year, month,
               const dateStr = fmt(day)
               const record = recordMap.get(dateStr)
               const isWe = isWeekend(day)
+              const isHol = isHoliday(dateStr, holidays)
+              const effOt = record ? effectiveOvertime(record, dateStr, day) : 0
               return (
                 <tr
                   key={dateStr}
-                  className={`${isWe ? 'bg-gray-50 text-gray-400' : !record ? 'bg-yellow-50' : ''}`}
+                  className={`${isWe || isHol ? 'bg-gray-50 text-gray-400' : !record ? 'bg-yellow-50' : ''}`}
                 >
-                  <td className="px-3 py-2 font-medium whitespace-nowrap">{dateLabel(day)}</td>
+                  <td className="px-3 py-2 font-medium whitespace-nowrap">
+                    {dateLabel(day)}{isHol && !isWe ? ' 🗓' : ''}
+                  </td>
                   <td className="px-3 py-2">{CZECH_DAYS[day.getDay()]}</td>
                   <td className="px-3 py-2">{record?.time_from?.slice(0, 5) ?? '—'}</td>
                   <td className="px-3 py-2">{record?.time_to?.slice(0, 5) ?? '—'}</td>
                   <td className="px-3 py-2">{record ? `${record.break_minutes} min` : '—'}</td>
                   <td className="px-3 py-2">{record ? `${Number(record.hours_worked).toFixed(2)}h` : '—'}</td>
-                  <td className={`px-3 py-2 font-medium ${record ? (record.overtime >= 0 ? 'text-green-600' : 'text-red-500') : ''}`}>
-                    {record ? `${fmtOvertime(record.overtime)}h` : '—'}
+                  <td className={`px-3 py-2 font-medium ${record ? (effOt >= 0 ? 'text-green-600' : 'text-red-500') : ''}`}>
+                    {record ? `${fmtOvertime(effOt)}h` : '—'}
                   </td>
                   <td className="px-3 py-2 text-gray-500 max-w-32 truncate">{record?.location ?? '—'}</td>
                   <td className="px-3 py-2 text-gray-400 text-xs whitespace-nowrap">
@@ -348,22 +365,25 @@ export default function MonthlyAttendanceTable({ employee, records, year, month,
           const dateStr = fmt(day)
           const record = recordMap.get(dateStr)
           const isWe = isWeekend(day)
+          const isHol = isHoliday(dateStr, holidays)
+          const effOt = record ? effectiveOvertime(record, dateStr, day) : 0
 
-          if (isWe && !record) {
+          if ((isWe || isHol) && !record) {
             return (
               <div key={dateStr} className="bg-gray-50 rounded-lg border border-gray-100 px-4 py-2 flex justify-between text-gray-400 text-sm">
                 <span>{dateLabel(day)} {CZECH_DAYS[day.getDay()]}</span>
-                <span>Víkend</span>
+                <span>{isHol && !isWe ? 'Svátek' : 'Víkend'}</span>
               </div>
             )
           }
 
           return (
-            <div key={dateStr} className={`rounded-lg border px-4 py-3 ${!record && !isWe ? 'bg-yellow-50 border-yellow-200' : 'bg-white'}`}>
+            <div key={dateStr} className={`rounded-lg border px-4 py-3 ${!record && !isWe && !isHol ? 'bg-yellow-50 border-yellow-200' : 'bg-white'}`}>
               <div className="flex justify-between items-start">
                 <div>
                   <p className="font-medium text-sm">
                     {dateLabel(day)} <span className="text-gray-400">{CZECH_DAYS[day.getDay()]}</span>
+                    {isHol && !isWe && <span className="text-xs text-orange-500 ml-1">svátek</span>}
                   </p>
                   {record ? (
                     <p className="text-xs text-gray-500 mt-0.5">
@@ -378,8 +398,8 @@ export default function MonthlyAttendanceTable({ employee, records, year, month,
                   {record && (
                     <div className="text-right">
                       <p className="text-sm font-medium">{Number(record.hours_worked).toFixed(2)}h</p>
-                      <p className={`text-xs font-medium ${record.overtime >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                        {fmtOvertime(record.overtime)}h
+                      <p className={`text-xs font-medium ${effOt >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                        {fmtOvertime(effOt)}h
                       </p>
                     </div>
                   )}
