@@ -40,6 +40,14 @@ export default async function EmployeeDochazkaPage({ params, searchParams }: Pro
     .lte('date', endDate)
     .order('date')
 
+  const { data: monthlyOvertime } = await supabase
+    .from('monthly_overtime')
+    .select('mode, carried_in')
+    .eq('employee_id', id)
+    .eq('year', year)
+    .eq('month', month)
+    .maybeSingle()
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b px-4 py-3 flex justify-between items-center sticky top-0 z-10">
@@ -66,6 +74,8 @@ export default async function EmployeeDochazkaPage({ params, searchParams }: Pro
           year={year}
           month={month}
           employeeId={id}
+          carriedIn={monthlyOvertime?.carried_in ?? 0}
+          overtimeMode={(monthlyOvertime?.mode ?? 'pay') as 'pay' | 'carry'}
         />
       </main>
     </div>

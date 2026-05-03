@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Profile, AttendanceRecord } from '@/types'
 import AttendanceEditModal from './AttendanceEditModal'
+import { setOvertimeMode } from '@/app/admin/dochazka/actions'
 
 type Props = {
   employee: Profile
@@ -11,6 +12,8 @@ type Props = {
   year: number
   month: number
   employeeId: string
+  carriedIn: number
+  overtimeMode: 'pay' | 'carry'
 }
 
 type EditDay = {
@@ -47,9 +50,11 @@ function dateLabel(day: Date): string {
   return `${day.getDate()}. ${day.getMonth() + 1}.`
 }
 
-export default function MonthlyAttendanceTable({ employee, records, year, month, employeeId }: Props) {
+export default function MonthlyAttendanceTable({ employee, records, year, month, employeeId, carriedIn, overtimeMode }: Props) {
   const router = useRouter()
   const [editDay, setEditDay] = useState<EditDay | null>(null)
+  const [mode, setMode] = useState<'pay' | 'carry'>(overtimeMode)
+  const [isPending, startTransition] = useTransition()
   const days = getDaysInMonth(year, month)
 
   const recordMap = new Map<string, AttendanceRecord>()
@@ -60,6 +65,14 @@ export default function MonthlyAttendanceTable({ employee, records, year, month,
 
   const totalHours = records.reduce((s, r) => s + Number(r.hours_worked || 0), 0)
   const totalOvertime = records.reduce((s, r) => s + Number(r.overtime || 0), 0)
+  const totalBalance = Math.round((carriedIn + totalOvertime) * 100) / 100
+
+  function handleModeChange(newMode: 'pay' | 'carry') {
+    setMode(newMode)
+    startTransition(async () => {
+      await setOvertimeMode(employeeId, year, month, newMode, carriedIn)
+    })
+  }
 
   async function handleExport() {
     const ExcelJS = (await import('exceljs')).default
@@ -211,6 +224,42 @@ export default function MonthlyAttendanceTable({ employee, records, year, month,
           <p className={`text-2xl font-bold ${totalOvertime >= 0 ? 'text-green-600' : 'text-red-500'}`}>
             {fmtOvertime(totalOvertime)}h
           </p>
+        </div>
+      </div>
+
+      {/* Přesčasy — převod */}
+      <div className="bg-white rounded-xl border p-4 space-y-3">
+        {carriedIn !== 0 && (
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-gray-500">Převedeno z {CZECH_MONTHS[prevMonth.month - 1]}</span>
+            <span className={`font-semibold px-2 py-0.5 rounded ${carriedIn >= 0 ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
+              {fmtOvertime(carriedIn)}h
+            </span>
+          </div>
+        )}
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-gray-500">Zbývá na konci měsíce</span>
+          <span className={`font-semibold px-2 py-0.5 rounded ${totalBalance >= 0 ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
+            {fmtOvertime(totalBalance)}h
+          </span>
+        </div>
+        <div className="flex items-center gap-2 pt-1 border-t">
+          <span className="text-sm text-gray-500 mr-1">Přesčasy:</span>
+          <button
+            onClick={() => handleModeChange('pay')}
+            disabled={isPending}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${mode === 'pay' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          >
+            Proplatit
+          </button>
+          <button
+            onClick={() => handleModeChange('carry')}
+            disabled={isPending}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${mode === 'carry' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          >
+            Převést do {CZECH_MONTHS[nextMonth.month - 1]}
+          </button>
+          {isPending && <span className="text-xs text-gray-400">Ukládám...</span>}
         </div>
       </div>
 
