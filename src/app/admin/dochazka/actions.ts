@@ -63,12 +63,21 @@ export async function setOvertimeMode(
 
   const { data: records } = await supabase
     .from('attendance_records')
-    .select('overtime')
+    .select('date, overtime, hours_worked')
     .eq('employee_id', employeeId)
     .gte('date', startDate)
     .lte('date', endDate)
 
-  const totalOvertime = (records ?? []).reduce((s, r) => s + Number(r.overtime || 0), 0)
+  const holidays = getCzechHolidays(year)
+  const totalOvertime = (records ?? []).reduce((s, r) => {
+    const d = new Date(r.date + 'T00:00:00')
+    const dow = d.getDay()
+    const weekend = dow === 0 || dow === 6
+    const effective = (weekend || isHoliday(r.date, holidays))
+      ? Number(r.hours_worked)
+      : Number(r.overtime)
+    return s + effective
+  }, 0)
   const balance = Math.round((carriedIn + totalOvertime) * 100) / 100
 
   const nextYear = month === 12 ? year + 1 : year
