@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Profile, AttendanceRecord } from '@/types'
 import AttendanceEditModal from './AttendanceEditModal'
-import { setOvertimeMode } from '@/app/admin/dochazka/actions'
+import { setOvertimeMode, fillMonthWithDefaults } from '@/app/admin/dochazka/actions'
 import { getCzechHolidays, isHoliday } from '@/lib/holidays'
 
 type Props = {
@@ -56,6 +56,7 @@ export default function MonthlyAttendanceTable({ employee, records, year, month,
   const [editDay, setEditDay] = useState<EditDay | null>(null)
   const [mode, setMode] = useState<'pay' | 'carry'>(overtimeMode)
   const [isPending, startTransition] = useTransition()
+  const [fillStatus, setFillStatus] = useState<string | null>(null)
   const days = getDaysInMonth(year, month)
 
   const recordMap = new Map<string, AttendanceRecord>()
@@ -79,6 +80,18 @@ export default function MonthlyAttendanceTable({ employee, records, year, month,
     return s + effectiveOvertime(r, r.date, date)
   }, 0)
   const totalBalance = Math.round((carriedIn + totalOvertime) * 100) / 100
+
+  async function handleFillMonth() {
+    if (!confirm(`Vyplnit všechny prázdné pracovní dny v ${CZECH_MONTHS[month - 1]} ${year} hodnotami 07:00–16:00, přestávka 60 min?`)) return
+    setFillStatus('Vyplňuji...')
+    const result = await fillMonthWithDefaults(employeeId, year, month)
+    if ('error' in result) {
+      setFillStatus(`Chyba: ${result.error}`)
+    } else {
+      setFillStatus(result.count === 0 ? 'Žádné prázdné dny k vyplnění.' : `Vyplněno ${result.count} dní.`)
+    }
+    setTimeout(() => setFillStatus(null), 4000)
+  }
 
   function handleModeChange(newMode: 'pay' | 'carry') {
     setMode(newMode)
@@ -240,8 +253,15 @@ export default function MonthlyAttendanceTable({ employee, records, year, month,
         </div>
       </div>
 
-      {/* Export */}
-      <div className="flex justify-end">
+      {/* Export + Vyplnit měsíc */}
+      <div className="flex items-center justify-end gap-3">
+        {fillStatus && <span className="text-sm text-gray-500">{fillStatus}</span>}
+        <button
+          onClick={handleFillMonth}
+          className="bg-blue-50 text-blue-700 border border-blue-200 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
+        >
+          Vyplnit pracovní dny
+        </button>
         <button
           onClick={handleExport}
           className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"

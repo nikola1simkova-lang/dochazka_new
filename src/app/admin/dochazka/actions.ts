@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { getCzechHolidays, isHoliday } from '@/lib/holidays'
 
 export async function upsertAttendanceRecord(formData: FormData) {
   const employee_id = formData.get('employee_id') as string
@@ -94,4 +95,42 @@ export async function setOvertimeMode(
 
   revalidatePath(`/admin/dochazka/${employeeId}`)
   return { success: true }
+}
+
+export async function fillMonthWithDefaults(employeeId: string, year: number, month: number) {
+  const supabase = await createClient()
+
+  const startDate = `${year}-${String(month).padStart(2, '0')}-01`
+  const lastDay = new Date(year, month, 0).getDate()
+  const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
+
+  const { data: existing } = await supabase
+    .from('attendance_records')
+    .select('date')
+    .eq('employee_id', employeeId)
+    .gte('date', startDate)
+    .lte('date', endDate)
+
+  const existingDates = new Set((existing ?? []).map(r => r.date))
+  const holidays = getCzechHolidays(year)
+
+  const toInsert: { employee_id: string; date: string; time_from: string; time_to: string; break_minutes: number; submitted_at: string }[] = []
+
+  for (let d = 1; d <= lastDay; d++) {
+    const date = new Date(year, month - 1, d)
+    const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+    const dow = date.getDay()
+    if (dow === 0 || dow === 6) continue
+    if (isHoliday(dateStr, holidays)) continue
+    if (existingDates.has(dateStr)) continue
+    toInsert.push({ employee_id: employeeId, date: dateStr, time_from: '07:00', time_to: '16:00', break_minutes: 60, submitted_at: new Date().toISOString() })
+  }
+
+  if (toInsert.length === 0) return { success: true, count: 0 }
+
+  const { error } = await supabase.from('attendance_records').insert(toInsert)
+  if (error) return { error: error.message }
+
+  revalidatePath(`/admin/dochazka/${employeeId}`)
+  return { success: true, count: toInsert.length }
 }

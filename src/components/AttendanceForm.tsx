@@ -15,7 +15,7 @@ function getTodayDate() {
 
 export default function AttendanceForm({ employeeId }: Props) {
   const [date, setDate] = useState(getTodayDate())
-  const [timeFrom, setTimeFrom] = useState('07:00')
+  const [timeFrom, setTimeFrom] = useState('06:30')
   const [timeTo, setTimeTo] = useState('16:00')
   const [breakMinutes, setBreakMinutes] = useState<0 | 30 | 60>(30)
   const [location, setLocation] = useState('')
@@ -48,7 +48,7 @@ export default function AttendanceForm({ employeeId }: Props) {
 
     setSuccess(true)
     setDate(getTodayDate())
-    setTimeFrom('07:00')
+    setTimeFrom('06:30')
     setTimeTo('16:00')
     setBreakMinutes(30)
     setLocation('')
