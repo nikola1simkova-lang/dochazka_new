@@ -29,6 +29,9 @@
 - Převod přesčasových hodin do dalšího měsíce (per zaměstnanec per měsíc)
 - Přesčasy na víkendy a státní svátky = všechny hodiny jsou přesčas
 - Státní svátky ČR pro všechny roky vč. pohyblivých Velikonoc
+- Tlačítko "Vyplnit pracovní dny" v adminu — vyplní prázdné Po–Pá (mimo svátky) hodnotami 07:00–16:00, přestávka 60 min
+- Zaměstnanecká app: defaultní čas Od = 06:30, Do = 16:00, přestávka 30 min
+- Sloupec `auto_filled` v `attendance_records` — zaměstnanec může přepsat automaticky vyplněný den, ale ne svůj již odeslaný záznam (migrace: 003_auto_filled.sql)
 
 ## Další kroky 🟡
 
