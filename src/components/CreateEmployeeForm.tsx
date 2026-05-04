@@ -79,8 +79,8 @@ export default function CreateEmployeeForm() {
               type={showPassword ? 'text' : 'password'}
               autoComplete="new-password"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Minimálně 6 znaků"
-              minLength={6}
+              placeholder="Heslo"
+              minLength={1}
               required
             />
             <button
