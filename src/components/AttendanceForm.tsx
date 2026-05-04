@@ -31,17 +31,21 @@ export default function AttendanceForm({ employeeId }: Props) {
     setError('')
     setSuccess(false)
 
-    const { error } = await supabase.from('attendance_records').insert({
-      employee_id: employeeId,
-      date,
-      time_from: timeFrom,
-      time_to: timeTo,
-      break_minutes: breakMinutes,
-      location: location || null,
-    })
+    const { error } = await supabase.from('attendance_records').upsert(
+      {
+        employee_id: employeeId,
+        date,
+        time_from: timeFrom,
+        time_to: timeTo,
+        break_minutes: breakMinutes,
+        location: location || null,
+        submitted_at: new Date().toISOString(),
+      },
+      { onConflict: 'employee_id,date' }
+    )
 
     if (error) {
-      setError(error.code === '23505' ? 'Na tento den už máš záznam.' : 'Nastala chyba, zkus znovu.')
+      setError('Nastala chyba, zkus znovu.')
       setLoading(false)
       return
     }
