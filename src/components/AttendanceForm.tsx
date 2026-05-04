@@ -31,6 +31,19 @@ export default function AttendanceForm({ employeeId }: Props) {
     setError('')
     setSuccess(false)
 
+    const { data: existing } = await supabase
+      .from('attendance_records')
+      .select('auto_filled')
+      .eq('employee_id', employeeId)
+      .eq('date', date)
+      .maybeSingle()
+
+    if (existing && !existing.auto_filled) {
+      setError('Na tento den už máš záznam, který nelze přepsat.')
+      setLoading(false)
+      return
+    }
+
     const { error } = await supabase.from('attendance_records').upsert(
       {
         employee_id: employeeId,
@@ -40,6 +53,7 @@ export default function AttendanceForm({ employeeId }: Props) {
         break_minutes: breakMinutes,
         location: location || null,
         submitted_at: new Date().toISOString(),
+        auto_filled: false,
       },
       { onConflict: 'employee_id,date' }
     )

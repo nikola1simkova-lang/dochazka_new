@@ -114,7 +114,7 @@ export async function fillMonthWithDefaults(employeeId: string, year: number, mo
   const existingDates = new Set((existing ?? []).map(r => r.date))
   const holidays = getCzechHolidays(year)
 
-  const toInsert: { employee_id: string; date: string; time_from: string; time_to: string; break_minutes: number; submitted_at: string }[] = []
+  const toInsert: { employee_id: string; date: string; time_from: string; time_to: string; break_minutes: number; submitted_at: string; auto_filled: boolean }[] = []
 
   for (let d = 1; d <= lastDay; d++) {
     const date = new Date(year, month - 1, d)
@@ -123,7 +123,7 @@ export async function fillMonthWithDefaults(employeeId: string, year: number, mo
     if (dow === 0 || dow === 6) continue
     if (isHoliday(dateStr, holidays)) continue
     if (existingDates.has(dateStr)) continue
-    toInsert.push({ employee_id: employeeId, date: dateStr, time_from: '07:00', time_to: '16:00', break_minutes: 60, submitted_at: new Date().toISOString() })
+    toInsert.push({ employee_id: employeeId, date: dateStr, time_from: '07:00', time_to: '16:00', break_minutes: 60, submitted_at: new Date().toISOString(), auto_filled: true })
   }
 
   if (toInsert.length === 0) return { success: true, count: 0 }
