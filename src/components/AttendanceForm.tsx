@@ -139,7 +139,7 @@ export default function AttendanceForm({ employeeId }: Props) {
             type="text"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="w-full max-w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full max-w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="např. Praha, Brno, home office..."
           />
         </div>
