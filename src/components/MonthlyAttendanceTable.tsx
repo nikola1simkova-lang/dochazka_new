@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Profile, AttendanceRecord } from '@/types'
 import AttendanceEditModal from './AttendanceEditModal'
-import { setOvertimeMode, fillMonthWithDefaults } from '@/app/admin/dochazka/actions'
+import { setOvertimeMode, fillMonthWithDefaults, saveMonthNote } from '@/app/admin/dochazka/actions'
 import { getCzechHolidays, isHoliday } from '@/lib/holidays'
 
 type Props = {
@@ -15,6 +15,7 @@ type Props = {
   employeeId: string
   carriedIn: number
   overtimeMode: 'pay' | 'carry'
+  note: string
 }
 
 type EditDay = {
@@ -51,12 +52,15 @@ function dateLabel(day: Date): string {
   return `${day.getDate()}. ${day.getMonth() + 1}.`
 }
 
-export default function MonthlyAttendanceTable({ employee, records, year, month, employeeId, carriedIn, overtimeMode }: Props) {
+export default function MonthlyAttendanceTable({ employee, records, year, month, employeeId, carriedIn, overtimeMode, note }: Props) {
   const router = useRouter()
   const [editDay, setEditDay] = useState<EditDay | null>(null)
   const [mode, setMode] = useState<'pay' | 'carry'>(overtimeMode)
   const [isPending, startTransition] = useTransition()
   const [fillStatus, setFillStatus] = useState<string | null>(null)
+  const [noteText, setNoteText] = useState(note)
+  const [noteSaving, setNoteSaving] = useState(false)
+  const [noteSaved, setNoteSaved] = useState(false)
   const days = getDaysInMonth(year, month)
 
   const recordMap = new Map<string, AttendanceRecord>()
@@ -204,6 +208,15 @@ export default function MonthlyAttendanceTable({ employee, records, year, month,
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+  }
+
+  async function handleNoteSave() {
+    if (noteText === note) return
+    setNoteSaving(true)
+    await saveMonthNote(employeeId, year, month, noteText)
+    setNoteSaving(false)
+    setNoteSaved(true)
+    setTimeout(() => setNoteSaved(false), 2000)
   }
 
   return (
@@ -443,6 +456,23 @@ export default function MonthlyAttendanceTable({ employee, records, year, month,
           </button>
           {isPending && <span className="text-xs text-gray-400">Ukládám...</span>}
         </div>
+      </div>
+
+      {/* Poznámka k měsíci */}
+      <div className="bg-white rounded-xl border p-4 space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-gray-700">Poznámka</span>
+          {noteSaving && <span className="text-xs text-gray-400">Ukládám...</span>}
+          {noteSaved && <span className="text-xs text-green-600">Uloženo</span>}
+        </div>
+        <textarea
+          value={noteText}
+          onChange={e => setNoteText(e.target.value)}
+          onBlur={handleNoteSave}
+          rows={4}
+          placeholder="Sem si můžete psát poznámky k tomuto měsíci..."
+          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
       </div>
     </div>
   )

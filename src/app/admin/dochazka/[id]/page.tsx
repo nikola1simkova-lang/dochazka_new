@@ -42,7 +42,7 @@ export default async function EmployeeDochazkaPage({ params, searchParams }: Pro
 
   const { data: monthlyOvertime } = await supabase
     .from('monthly_overtime')
-    .select('mode, carried_in')
+    .select('mode, carried_in, note')
     .eq('employee_id', id)
     .eq('year', year)
     .eq('month', month)
@@ -76,6 +76,7 @@ export default async function EmployeeDochazkaPage({ params, searchParams }: Pro
           employeeId={id}
           carriedIn={monthlyOvertime?.carried_in ?? 0}
           overtimeMode={(monthlyOvertime?.mode ?? 'pay') as 'pay' | 'carry'}
+          note={monthlyOvertime?.note ?? ''}
         />
       </main>
     </div>
